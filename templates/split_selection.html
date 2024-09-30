@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Selection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/split_selection.css') }}">
+     <script>
+        // This script disables any JS interference on form submit
+        document.addEventListener("DOMContentLoaded", function() {
+            // Get the form element
+            const form = document.querySelector("form");
+
+            if (form) {
+                // Remove any existing 'submit' event listeners to prevent interference
+                const newForm = form.cloneNode(true);
+                form.parentNode.replaceChild(newForm, form);
+
+                // Ensure that the form submits normally
+                newForm.addEventListener("submit", function(event) {
+                    console.log("Form is submitting normally");
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+<h1>Split Selection</h1>
+
+<div class="legend">
+    <p>
+        <strong>Legend:</strong> Number each page according to the split groups you want.
+        For example, if pages 1 and 2 should be in the same group, assign them the same number.
+        Separate PNGs and a merged PDF will be created for each group based on your numbering.
+    </p>
+</div>
+ <form action="{{ url_for('group_pdf') }}" method="POST">
+
+
+        <!-- Image grid for the PDF pages -->
+        <div class="image-grid">
+            <!-- Loop over the PNG files and display them with group input fields -->
+            {% for png_file in png_files %}
+            <div class="image-container">
+                <img src="{{ url_for('static', filename=output_path + '/' + png_file) }}" alt="Page {{ loop.index }}">
+                <label for="page_{{ loop.index }}">Group for Page {{ loop.index }}:</label>
+                <input type="number" id="page_{{ loop.index }}" name="page_{{ loop.index }}" min="1" value="1" required>
+            </div>
+            {% endfor %}
+        </div>
+
+    <input type="hidden" name="original_filename" value="{{ original_pdf_filename }}">
+    <button type="submit">Download Groups</button>
+    </form>
+
+</body>
+</html>
